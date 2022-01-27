@@ -14,14 +14,14 @@ Règles de gestion :
 
 Tâches à effectuer :
 
-- Corriger le code correspondant aux tests existants qui échouent (un commit par erreur dans le code detectée)
-- Implémenter les tests unitaires de la couche service (avec Mock si nécessaire)
-- Implémenter les tests d'intégration de la couche service avec la couche repositories
-- Complèter le code de la méthode checkEcritureComptableUnit et écrire le test correspondant
-- Implémenter la méthode addReference en appliquant la méthodologie TDD (commit du/des tests puis commit du code)
-- Mettre en place une configuration pour séparer les données de production et les données de tests
-- Ajouter le plugin Jacoco pour obtenir le coverage
-- Implémenter un controller REST qui permettra d'ajouter, de modifier et de supprimer une écriture comptable et écrire les tests fonctionnels associés
+- [x] Corriger le code correspondant aux tests existants qui échouent (un commit par erreur dans le code detectée)
+- [x] Implémenter les tests unitaires de la couche service (avec Mock si nécessaire)
+- [x] Implémenter les tests d'intégration de la couche service avec la couche repositories
+- [ ] Complèter le code de la méthode checkEcritureComptableUnit et écrire le test correspondant
+- [ ] Implémenter la méthode addReference en appliquant la méthodologie TDD (commit du/des tests puis commit du code)
+- [ ] Mettre en place une configuration pour séparer les données de production et les données de tests
+- [ ] Ajouter le plugin Jacoco pour obtenir le coverage
+- [ ] Implémenter un controller REST qui permettra d'ajouter, de modifier et de supprimer une écriture comptable et écrire les tests fonctionnels associés
 
 Rendu :
 
