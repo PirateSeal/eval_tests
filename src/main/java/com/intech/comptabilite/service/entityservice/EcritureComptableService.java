@@ -58,7 +58,7 @@ public class EcritureComptableService {
 				vRetour = vRetour.add(vLigneEcritureComptable.getDebit());
 			}
 		}
-		return vRetour;
+		return vRetour.setScale(2);
 	}
 
 	/**
@@ -70,11 +70,11 @@ public class EcritureComptableService {
 	public BigDecimal getTotalCredit(EcritureComptable ecriture) {
 		BigDecimal vRetour = BigDecimal.ZERO;
 		for (LigneEcritureComptable vLigneEcritureComptable : ecriture.getListLigneEcriture()) {
-			if (vLigneEcritureComptable.getDebit() != null) {
-				vRetour = vRetour.add(vLigneEcritureComptable.getDebit());
+			if (vLigneEcritureComptable.getCredit() != null) {
+				vRetour = vRetour.add(vLigneEcritureComptable.getCredit());
 			}
 		}
-		return vRetour;
+		return vRetour.setScale(2);
 	}
 
 	/**
