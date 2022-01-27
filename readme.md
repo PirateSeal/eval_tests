@@ -20,7 +20,7 @@ Tâches à effectuer :
 - [x] Complèter le code de la méthode checkEcritureComptableUnit et écrire le test correspondant
 - [x] Implémenter la méthode addReference en appliquant la méthodologie TDD (commit du/des tests puis commit du code)
 - [ ] Mettre en place une configuration pour séparer les données de production et les données de tests
-- [ ] Ajouter le plugin Jacoco pour obtenir le coverage
+- [x] Ajouter le plugin Jacoco pour obtenir le coverage
 - [ ] Implémenter un controller REST qui permettra d'ajouter, de modifier et de supprimer une écriture comptable et écrire les tests fonctionnels associés
 
 Rendu :
