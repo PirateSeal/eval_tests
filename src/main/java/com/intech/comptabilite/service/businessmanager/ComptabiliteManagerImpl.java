@@ -1,33 +1,23 @@
 package com.intech.comptabilite.service.businessmanager;
 
-import java.math.BigDecimal;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Set;
-
-import javax.validation.Configuration;
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import com.intech.comptabilite.model.CompteComptable;
-import com.intech.comptabilite.model.EcritureComptable;
-import com.intech.comptabilite.model.JournalComptable;
-import com.intech.comptabilite.model.LigneEcritureComptable;
-import com.intech.comptabilite.model.SequenceEcritureComptable;
+import com.intech.comptabilite.model.*;
 import com.intech.comptabilite.service.entityservice.CompteComptableService;
 import com.intech.comptabilite.service.entityservice.EcritureComptableService;
 import com.intech.comptabilite.service.entityservice.JournalComptableService;
 import com.intech.comptabilite.service.entityservice.SequenceEcritureComptableService;
 import com.intech.comptabilite.service.exceptions.FunctionalException;
 import com.intech.comptabilite.service.exceptions.NotFoundException;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import javax.validation.*;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Set;
 
 @Service
 public class ComptabiliteManagerImpl implements ComptabiliteManager {
@@ -83,6 +73,25 @@ public class ComptabiliteManagerImpl implements ComptabiliteManager {
                 4.  Enregistrer (insert/update) la valeur de la séquence en persitance
                     (table sequence_ecriture_comptable)
          */
+
+        DecimalFormat formatter = new DecimalFormat("00000");
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(pEcritureComptable.getDate());
+
+        String mk1 = pEcritureComptable.getJournal().getCode();
+        int mk2 = calendar.get(Calendar.YEAR);
+        int mk3 = 0;
+
+        try {
+            mk3 = sequenceEcritureComptableService.getDernierValeurByCodeAndAnnee(mk1, mk2);
+        } catch (Exception e) {
+            mk3 = 1;
+        } finally {
+            String reference = String.format("%s-%s/%s", mk1, mk2, formatter.format(mk3));
+            pEcritureComptable.setReference(reference);
+            sequenceEcritureComptableService.upsert(new SequenceEcritureComptable(mk1, mk2, mk3));
+        }
     }
 
     /**
@@ -137,10 +146,39 @@ public class ComptabiliteManagerImpl implements ComptabiliteManager {
                 "L'écriture comptable doit avoir au moins deux lignes : une ligne au débit et une ligne au crédit.");
         }
 
-        // TODO ===== RG_Compta_5 : Format et contenu de la référence
+        // RG_Compta_5 : Format et contenu de la référence
         // vérifier que l'année dans la référence correspond bien à la date de l'écriture, idem pour le code journal...
+
+        if (pEcritureComptable.getReference() != null) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(pEcritureComptable.getDate());
+            var string = pEcritureComptable.getReference().split("-", 4);
+            if (!string[0].equals(pEcritureComptable.getJournal().getCode())) {
+                throw new FunctionalException(
+                        "Le code dans la reference de l'ecriture comptable ne correspond pas au code du journal.");
+            }
+            if (!string[1].split("/", 5)[0].equals(String.valueOf(cal.get(Calendar.YEAR)))) {
+                throw new FunctionalException(
+                        "La date dans la reference de l'ecriture comptable ne correspond pas à la date de l'ecriture.");
+            }
+        }
     }
 
+    /*public HashMap<String, String> regexRG5(EcritureComptable pEcritureComptable) {
+        String line = pEcritureComptable.getReference();
+        String pattern = "(?<code>\\w*)-(?<year>\\d{4})/(?<value>\\d{5})";
+
+        Pattern r = Pattern.compile(pattern);
+
+        Matcher m = r.matcher(line);
+
+        HashMap<String, String> result = new HashMap<String, String>();
+        result.put("code", m.group(1));
+        result.put("year", m.group(2));
+        result.put("value", m.group(3));
+
+        return result;
+    }*/
 
     /**
      * Vérifie que l'Ecriture comptable respecte les règles de gestion liées au contexte
@@ -193,7 +231,7 @@ public class ComptabiliteManagerImpl implements ComptabiliteManager {
     public void deleteEcritureComptable(Integer pId) {
        ecritureComptableService.deleteEcritureComptable(pId);
     }
-    
+
     protected Validator getConstraintValidator() {
         Configuration<?> vConfiguration = Validation.byDefaultProvider().configure();
         ValidatorFactory vFactory = vConfiguration.buildValidatorFactory();
